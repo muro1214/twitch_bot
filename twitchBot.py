@@ -15,11 +15,14 @@ bot = commands.Bot(
     initial_channels=[config.CHANNEL]
 )
 
+bms_list = [{'url': 'http://mirai-yokohama.sakura.ne.jp/bms/data.json', 'prefix': '★'},
+            {'url': 'https://stellabms.xyz/sl/score.json', 'prefix': 'sl'},
+            {'url': 'https://stellabms.xyz/st/score.json', 'prefix': 'st'}
+            ]
 
-def get_insane_song(filter=None):
-    url = 'http://mirai-yokohama.sakura.ne.jp/bms/data.json'
 
-    res = requests.get(url)
+def random_select(bms, filter=None):
+    res = requests.get(bms['url'])
     if not res.status_code == requests.codes.ok:
         return f"Error. status = {res.status_code}"
 
@@ -33,7 +36,18 @@ def get_insane_song(filter=None):
 
     i = random.randrange(len(jsonData))
 
-    return f"★{jsonData[i]['level']} {jsonData[i]['title']}"
+    return f"{bms['prefix']}{jsonData[i]['level']} {jsonData[i]['title']}"
+
+
+async def channel_send(ctx, bms):
+    if ' ' in ctx.content:
+        song = random_select(bms, ctx.content.split()[1])
+    else:
+        song = random_select(bms)
+
+    message = f"Random Select -> [{song}] from {ctx.author.name}"
+
+    await ctx.channel.send(message)
 
 
 @bot.event
@@ -43,14 +57,17 @@ async def event_ready():
 
 @bot.command(name='insane')
 async def insane(ctx):
-    if ' ' in ctx.content:
-        song = get_insane_song(ctx.content.split()[1])
-    else:
-        song = get_insane_song()
+    await channel_send(ctx, bms_list[0])
 
-    message = f"Random Select -> [{song}] from {ctx.author.name}"
 
-    await ctx.channel.send(message)
+@bot.command(name='sl')
+async def satellite(ctx):
+    await channel_send(ctx, bms_list[1])
+
+
+@bot.command(name='st')
+async def stella(ctx):
+    await channel_send(ctx, bms_list[2])
 
 
 if __name__ == '__main__':
