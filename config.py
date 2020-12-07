@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-from os.path import join, dirname
+from pathlib import Path
 from dotenv import load_dotenv
 
-dotenv_path = join(dirname(__file__), '.env')
-load_dotenv(dotenv_path)
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
 
-OAUTH = os.environ.get('TWITCH_OAUTH')
-CLIENT_ID = os.environ.get('CLIENT_ID')
-BOT_NAME = os.environ.get('BOT_NAME')
-BOT_PREFIX = os.environ.get('BOT_PREFIX')
-CHANNEL = os.environ.get('CHANNEL')
+OAUTH = os.getenv('TWITCH_OAUTH')
+CLIENT_ID = os.getenv('CLIENT_ID')
+BOT_NAME = os.getenv('BOT_NAME')
+BOT_PREFIX = os.getenv('BOT_PREFIX')
+CHANNEL = os.getenv('CHANNEL')
+
+print(OAUTH)
